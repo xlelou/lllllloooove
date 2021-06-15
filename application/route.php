@@ -36,6 +36,9 @@ Route::get('/room/rightform','room/right/rightform');//编辑权限页面
 Route::get('/room/menuform','room/menu/menuform');//控制器编辑页面
 Route::get('/room/frontUpolad','room/banners/frontUpload');//前端页面轮播图
 Route::get('/room/bannerForm','room/banners/bannerForm');
+Route::get('/room/code','room/code/index');
+
+
 Route::get('/front/banners','index/banner/index');
 
 
@@ -45,7 +48,7 @@ Route::get('/room/UserLists','room/User/userLists');//获取用户列表
 Route::get('/room/roleList','room/Role/getRoleList');//获取角色列表
 Route::get('/room/rightList','room/right/getallrights');//获取所有权限
 Route::get('/room/menulist','room/menu/getMenu');//获取菜单控制器
-
+Route::get('/room/codeList','room/Code/getCodeList');//获取码表列表
 //post
 Route::post('/room/login','room/Index/login');//登录提交
 Route::post('/room/systemSetting','room/System/saveSettings');//保存系统设置
