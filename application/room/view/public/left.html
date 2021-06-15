@@ -1,0 +1,109 @@
+<!-- 侧边菜单 -->
+<div class="layui-side layui-side-menu">
+    <div class="layui-side-scroll">
+        <div class="layui-logo" lay-href="/room/console">
+            <span>{$sysSettings.systemName}</span>
+        </div>
+
+        <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu"
+            lay-filter="layadmin-system-side-menu">
+            <li data-name="home" class="layui-nav-item layui-nav-itemed">
+                <a href="javascript:;" lay-tips="主页" lay-direction="2">
+                    <i class="layui-icon layui-icon-home"></i>
+                    <cite>主页</cite>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd data-name="console" class="layui-this">
+                        <a lay-href="/room/console">控制台</a>
+                    </dd>
+                </dl>
+            </li>
+            <li data-name="component" class="layui-nav-item">
+                <a href="javascript:;" lay-tips="system" lay-direction="2">
+                    <i class="layui-icon layui-icon-component"></i>
+                    <cite>系统管理</cite>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd data-name="list"><a lay-href="/room/systemSetting">系统配置</a></dd>
+                </dl>
+                <dl class="layui-nav-child">
+                    <dd data-name="list"><a lay-href="/room/user">用户管理</a></dd>
+                </dl>
+                <dl class="layui-nav-child">
+                    <dd data-name="list"><a lay-href="/room/role">角色管理</a></dd>
+                </dl>
+                <dl class="layui-nav-child">
+                    <dd data-name="list"><a lay-href="/room/right">权限管理</a></dd>
+                </dl>
+                <dl class="layui-nav-child">
+                    <dd data-name="list"><a lay-href="/room/Menu">菜单管理</a></dd>
+                </dl>
+            </li>
+            <li data-name="set" class="layui-nav-item">
+                <a href="javascript:;" lay-tips="设置" lay-direction="2">
+                    <i class="layui-icon layui-icon-set"></i>
+                    <cite>设置</cite>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd class="layui-nav-itemed">
+                        <a href="javascript:;">系统设置</a>
+                        <dl class="layui-nav-child">
+                            <dd><a lay-href="/room/systemSetting">网站设置</a></dd>
+                        </dl>
+                    </dd>
+                    <dd class="layui-nav-itemed">
+                        <a href="javascript:;">我的设置</a>
+                        <dl class="layui-nav-child">
+                            <dd><a lay-href="/room/userSetting">基本资料</a></dd>
+                            <dd><a lay-href="/room/changePassword">修改密码</a></dd>
+                        </dl>
+                    </dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+</div>
+<script src="/static/admin/lib/jquery/dist/jquery.js"></script>
+<script>
+    <?php
+            if(!isset($urls)){
+
+            }else{
+                ?>
+                var urls = <?=$urls?>;
+                console.log(urls)
+                var arr = {}
+                for(var i = 0;i<urls.length;i++){
+                    console.log(arr.hasOwnProperty(urls[i].pname.name))
+                    if(arr.hasOwnProperty(urls[i].pname.name)>0){
+                        arr[urls[i].pname.name].push(urls[i])
+                    }else{
+                        arr[urls[i].pname.name] = []
+                        arr[urls[i].pname.name].push(urls[i])
+                    }
+                }
+
+                var html = ''
+                for(var i in arr){
+                    var child = '';
+                    for(var j =0;j<arr[i].length;j++){
+                        console.log(arr[i][j])
+                        child += `<dl class="layui-nav-child">
+                        <dd data-name="list"><a lay-href="${arr[i][j].name}">${arr[i][j].title}</a></dd>
+                    </dl>`
+                    }
+                    html += `<li data-name="home" class="layui-nav-item">
+                    <a href="javascript:;" lay-tips="${i}" lay-direction="2">
+                            <cite>${i}</cite>
+                            </a>
+                            ${child}
+                        </li>`
+                }
+                $('#LAY-system-side-menu').html('').html($(html))
+            <?php
+            }
+
+            ?>
+
+
+</script>

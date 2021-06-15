@@ -1,0 +1,240 @@
+{include file='public/head' /}
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+
+        </div>
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-role" data-type="batchdel">删除</button>
+                <button class="layui-btn layuiadmin-btn-role" data-type="add">添加</button>
+            </div>
+
+            <table id="test-table-page" lay-filter="test-table-page">
+
+            </table>
+            <script type="text/html" id="buttonTpl">
+                {{#  if(d.check == true){ }}
+                <button class="layui-btn layui-btn-xs">已审核</button>
+                {{#  } else { }}
+                <button class="layui-btn layui-btn-primary layui-btn-xs">未审核</button>
+                {{#  } }}
+            </script>
+            <script type="text/html" id="table-useradmin-admin">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+{include file="public/foot" /}
+<script>
+    layui.config({
+        base: base_static //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table','laypage'], function() {
+        var admin = layui.admin
+                , table = layui.table
+                ,  $ = layui.$
+                ,laypage = layui.laypage
+
+        table.render({
+            elem: '#test-table-page'
+            , url: '/room/menulist'
+            ,parseData: function(res){ //res 即为原始返回的数据
+                console.log(res)
+                if(res.code===0){
+                    return {
+                        "code": res.code, //解析接口状态
+                        "msg": res.msg, //解析提示文本
+                        "count": res.count, //解析数据长度
+                        "data": res.data //解析数据列表
+                    };
+                }else{
+                    alert(res.msg)
+                    return false
+                }
+            }
+            , cols: [[
+                {type: "checkbox", fixed: "left"},
+                {field: 'id', width: 80, title: 'ID'}
+                , {field: 'name', align: "center", title: '名称'}
+                , {field: 'sort', width: 80, align: "center", title: '排序'},
+                {field: "status", width: 80, title: "状态", align: "center",templet:function (d) {
+                    if(d.status==='0'){
+                        return '可用'
+                    }else{
+                        return '禁用'
+                    }
+                }}
+                ,{
+                    title: "操作",
+                    width: 150,
+                    align: "center",
+                    fixed: "right",
+                    toolbar: "#table-useradmin-admin"
+                }
+            ]]
+            ,page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+                layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+                //,curr: 5 //设定初始在第 5 页
+                ,groups: 1 //只显示 1 个连续页码
+                ,first: false //不显示首页
+                ,last: false //不显示尾页
+            }
+        });
+        //事件
+        var active = {
+            batchdel: function(){
+                var checkStatus = table.checkStatus('test-table-page')
+                        ,checkData = checkStatus.data; //得到选中的数据
+
+                if(checkData.length === 0){
+                    return layer.msg('请选择数据');
+                }
+
+                layer.confirm('确定删除吗？', function(index) {
+                    for(var i=0;i<checkData.length;i++){
+                        var field = {
+                            id:checkData[i].id
+                        }
+                        $.ajax({
+                            url:'/room/delmenu',
+                            type:'post',
+                            data:field,
+                            success:function (d) {
+                                if(d.code===200){
+                                    layer.alert(d.msg)
+                                    layer.msg(d.msg)
+                                    table.reload('test-table-page');
+                                }else{
+                                    layer.msg(d.msg)
+                                }
+
+                            }
+                        });
+                    }
+                    //执行 Ajax 后重载
+                    table.reload('test-table-page');
+                    layer.msg('已删除');
+                });
+            },
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '添加新用戶'
+                    ,content: '/room/menuform?id=0'
+                    ,area: ['500px', '480px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                                ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+                            var field = data.field; //获取提交的字段
+                            console.log(field)
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url:'/room/addmenu',
+                                type:'post',
+                                data:field,
+                                success:function (d) {
+                                    if(d.code===200){
+                                        layer.alert(d.msg)
+                                        table.reload('test-table-page');
+                                        layer.close(index); //关闭弹层
+                                    }else{
+                                        layer.alert(d.msg, {
+                                            icon: 1,
+                                            skin: 'layer-ext-moon' //该皮肤由layer.seaning.com友情扩展。关于皮肤的扩展规则，去这里查阅
+                                        })
+                                    }
+                                }
+                            });
+
+                        });
+                        submit.trigger('click');
+                    }
+                });
+            }
+        }
+
+        //监听行工具事件
+        table.on('tool(test-table-page)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                layer.open({
+                    type: 2
+                    ,title: '添加新用户'
+                    ,content: '/room/menuform?id='+data.id+'&name='+data.name+'&status='+data.status+'&sort='+data.sort
+                    ,area: ['500px', '480px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                                ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+                            var field = data.field; //获取提交的字段
+                            console.log(field)
+                            if(!field.name){
+                                layer.msg("请输入控制器名称")
+                                return false
+                            }
+//                            if(!field.roleid){
+//                                layer.msg("请选择用户角色")
+//                                return false
+//                            }
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url:'/room/addmenu',
+                                type:'post',
+                                data:field,
+                                success:function (d) {
+                                    if(d.code===200){
+                                        layer.alert(d.msg)
+                                        table.reload('test-table-page');
+                                        layer.close(index); //关闭弹层
+                                    }else{
+                                        layer.alert(d.msg, {
+                                            icon: 1,
+                                            skin: 'layer-ext-moon' //该皮肤由layer.seaning.com友情扩展。关于皮肤的扩展规则，去这里查阅
+                                        })
+                                    }
+
+                                }
+                            });
+                        });
+                        submit.trigger('click');
+                    }
+                });
+            } else if (obj.event === 'del') {
+                var data = obj.data;
+                var field ={
+                    id:data.id
+                }
+                $.ajax({
+                    url:'/room/delmenu',
+                    type:'post',
+                    data:field,
+                    success:function (d) {
+                        if(d.code===200){
+                            layer.msg(d.msg)
+                            table.reload('test-table-page');
+                        }else{
+                            layer.msg(d.msg)
+                        }
+
+                    }
+                });
+            }
+
+        });
+
+        $('.layui-btn.layuiadmin-btn-role').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

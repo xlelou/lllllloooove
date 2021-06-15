@@ -1,0 +1,79 @@
+{include file="public/head" /}
+
+
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main">
+        <div class="layadmin-user-login-box layadmin-user-login-header">
+            <h2>All For One</h2>
+            <p>All For One Login Page</p>
+        </div>
+        <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-username"
+                       for="LAY-user-login-username"></label>
+                <input type="text" name="username" id="LAY-user-login-username" lay-verify="required" placeholder="username"
+                       class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="layadmin-user-login-icon layui-icon layui-icon-password"
+                       for="LAY-user-login-password"></label>
+                <input type="password" name="password" id="LAY-user-login-password" lay-verify="required"
+                       placeholder="password" class="layui-input">
+            </div>
+
+            <div class="layui-form-item" style="margin-bottom: 20px;">
+                <!-- <input type="checkbox" name="remember" lay-skin="primary" title="记住密码"> -->
+                <!-- <a href="forget.html" class="layadmin-user-jump-change layadmin-link" style="margin-top: 7px;">忘记密码？</a> -->
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+{include file="public/foot" /}
+<script>
+    layui.config({
+        base: base_static //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'user'], function () {
+        var $ = layui.$,
+                setter = layui.setter,
+                admin = layui.admin,
+                form = layui.form,
+                router = layui.router(),
+                search = router.search;
+        form.render();
+        //提交
+        form.on('submit(LAY-user-login-submit)', function (obj) {
+            console.log(obj)
+            //请求登入接口
+            admin.req({
+                url: '/room/login', //实际使用请改成服务端真实接口
+                type: 'post',
+                data: obj.field,
+                success: function (res) {
+                    console.log(res)
+                    if (res.code == 200) {
+                        location.href = '/room'; //后台主页
+                    }
+
+                }
+            });
+        });
+    });
+</script>
+
+<script language="JavaScript">
+
+    if (window != top)
+
+        top.location.href = location.href;
+
+</script>
+<!-- /.login-box -->

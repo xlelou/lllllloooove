@@ -1,0 +1,21 @@
+{include file='public/head' /}
+<body class="layui-layout-body">
+  
+<div id="LAY_app">
+
+  <div class="layui-layout layui-layout-admin">
+ {include file='public/header'}
+    <!-- 侧边菜单 -->
+    {include file='public/left'}
+    <!-- 页面标签 -->
+    {block name="content"}
+  
+    {/block}
+    <!-- /.content-wrapper -->
+    {include file='public/footer' /}
+
+</div>
+<!-- ./wrapper -->
+{include file="public/foot" /}
+</body>
+</html>

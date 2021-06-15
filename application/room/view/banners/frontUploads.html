@@ -1,0 +1,174 @@
+{include file='public/head' /}
+<body class="layui-layout-body">
+
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">主页轮播图管理</div>
+                <div class="layui-card-body">
+                    <div class="layui-btn-container">
+                        <button type="button" class="layui-btn" lay-event="uploadPic" id="test-upload-more">图片上传</button>
+                    </div>
+                    <table class="layui-hide" id="test-table-cellEdit" lay-filter="test-table-cellEdit"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/html" id="table-useradmin-admin">
+        <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+    </script>
+</div>
+
+<!-- ./wrapper -->
+{include file="public/foot" /}
+</body>
+</html>
+
+<script>
+    layui.config({
+        base: base_static //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'laydate','upload','table'], function(){
+        var $ = layui.$
+                ,admin = layui.admin
+                ,element = layui.element
+                ,layer = layui.layer
+                ,laydate = layui.laydate
+                ,form = layui.form
+                ,upload = layui.upload
+                ,table = layui.table;
+
+                upload.render({
+                    elem: '#test-upload-more'
+                    ,url: '/room/uploads/'
+                    ,multiple: true
+                    ,before: function(obj){
+                        //预读本地文件示例，不支持ie8
+                        obj.preview(function(index, file, result){
+        //                            $('#test-upload-more-list').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">')
+                        });
+                    }
+                    ,done: function(res){
+                        $.ajax({
+                            url:'/room/addBanner',
+                            type:'post',
+                            data:{
+                                id:0,
+                                path:res.data[0],
+                                sort:''
+                            },
+                            success:function (d) {
+                                if(d.code===200){
+                                    layer.msg(d.msg)
+                                    table.reload('test-table-cellEdit');
+                                }else{
+                                    layer.msg(d.msg)
+                                }
+
+                            }
+                        });
+                        console.log(res)
+                    }
+
+
+                });
+
+
+            table.render({
+                elem: '#test-table-cellEdit'
+                ,url: '/room/getBanners'
+                ,toolbar: '#test-table-toolbar-toolbarDemo'
+                ,cols: [[
+                    {type:'checkbox'}
+                    ,{field:'id', title:'ID', width:80, sort: true}
+                    ,{field:'pic', title:'图片预览',templet:function (d) {
+                        if(d.picPath!==''){
+                            return `<a href="/uploads/${d.picPath}" target="_blank" data-path="${d.picPaht}">点击查看图片</a>`;
+                        }else{
+                            return '暂无图片'
+                        }
+                    }}
+                    ,{field:'sort', title:'排序',maxWidth: 150}
+                    ,{
+                        title: "操作",
+                        width: 150,
+                        align: "center",
+                        fixed: "right",
+                        toolbar: "#table-useradmin-admin"
+                    }
+                ]]
+                , page: true
+            });
+
+        //监听行工具事件
+        table.on('tool(test-table-cellEdit)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                layer.open({
+                    type: 2
+                    ,title: '更改排序'
+                    ,content: '/room/bannerform?id='+data.id+'&sort='+data.sort + '&path='+data.path
+                    ,area: ['500px', '480px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                                ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+                            var field = data.field; //获取提交的字段
+                            console.log(field)
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url:'/room/addbanner',
+                                type:'post',
+                                data:field,
+                                success:function (d) {
+                                    if(d.code===200){
+                                        layer.alert(d.msg)
+                                        table.reload('test-table-cellEdit');
+                                        layer.close(index); //关闭弹层
+                                    }else{
+                                        layer.alert(d.msg, {
+                                            icon: 1,
+                                            skin: 'layer-ext-moon' //该皮肤由layer.seaning.com友情扩展。关于皮肤的扩展规则，去这里查阅
+                                        })
+                                    }
+
+                                }
+                            });
+                        });
+                        submit.trigger('click');
+                    }
+                });
+            } else if (obj.event === 'del') {
+                var data = obj.data;
+                var field ={
+                    id:data.id
+                }
+                $.ajax({
+                    url:'/room/delBanners',
+                    type:'post',
+                    data:field,
+                    success:function (d) {
+                        if(d.code===200){
+                            layer.msg(d.msg)
+                            table.reload('test-table-cellEdit');
+                        }else{
+                            layer.msg(d.msg)
+                        }
+
+                    }
+                });
+            }
+
+        });
+
+
+    });
+</script>

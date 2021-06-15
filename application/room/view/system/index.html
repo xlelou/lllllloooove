@@ -1,0 +1,116 @@
+{include file='public/head' /}
+<body class="layui-layout-body">
+
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">System Settings</div>
+        <div class="layui-card-body" style="padding: 15px;">
+            <form class="layui-form" action="" lay-filter="component-form-group">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">系统名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="systemName" lay-verify="systemName" autocomplete="off" value="{$settings.systemName}" placeholder="system name" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">系统关键词</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="keywords" lay-verify="required" value="{$settings.keywords}" placeholder="system keywords" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">系统描述</label>
+                    <div class="layui-input-block">
+                        <textarea name="describe" placeholder="system description" value="" class="layui-textarea">{$settings.describe}</textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-layout-admin">
+                    <div class="layui-input-block">
+                        <div class="layui-footer" style="left: 0;">
+                            <button class="layui-btn" lay-submit="" lay-filter="component-form-demo1">立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ./wrapper -->
+{include file="public/foot" /}
+</body>
+</html>
+
+<script>
+    layui.config({
+        base: base_static //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form', 'laydate','upload','table'], function(){
+        var $ = layui.$
+                ,admin = layui.admin
+                ,element = layui.element
+                ,layer = layui.layer
+                ,laydate = layui.laydate
+                ,form = layui.form
+                ,upload = layui.upload;
+
+        form.render(null, 'component-form-group');
+
+        laydate.render({
+            elem: '#LAY-component-form-group-date'
+        });
+
+        /* 自定义验证规则 */
+        form.verify({
+            systemName: function(value){
+                console.log(value)
+                if(value.length == 0){
+                    return '系统名称不能为空';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //多图片上传
+        upload.render({
+            elem: '#test-upload-more'
+            ,url: '/room/uploads/'
+            ,multiple: true
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+
+                });
+            }
+            ,done: function(res){
+                console.log(res)
+                $('#test-upload-more-list').append('<img src="/uploads/'+ res.data[0] +'" data-path="'+ res.data[0] +'" class="layui-upload-img">')
+                //上传完毕
+            }
+        });
+
+        /* 监听提交 */
+        form.on('submit(component-form-demo1)', function(data){
+            admin.req({
+                url: '/room/systemSetting', //实际使用请改成服务端真实接口
+                type: 'post',
+                data: data.field,
+                success: function (res) {
+                    console.log(res)
+                    if (res.code == 200) {
+                        //登入成功的提示与跳转
+//                        location.href = '/room'; //后台主页
+                    }
+
+                }
+            });
+            return false;
+        });
+    });
+</script>

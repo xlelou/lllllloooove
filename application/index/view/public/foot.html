@@ -1,0 +1,89 @@
+<!-- js -->
+<script type="text/javascript" src="__STATIC__/home/js/jquery-2.2.3.min.js"></script>
+<!-- //js -->
+<!-- password-script -->
+<script type="text/javascript">
+    window.onload = function () {
+        document.getElementById("password1").onchange = validatePassword;
+        document.getElementById("password2").onchange = validatePassword;
+    }
+
+    function validatePassword() {
+        var pass2 = document.getElementById("password2").value;
+        var pass1 = document.getElementById("password1").value;
+        if (pass1 != pass2)
+            document.getElementById("password2").setCustomValidity("Passwords Don't Match");
+        else
+            document.getElementById("password2").setCustomValidity('');
+        //empty string means no validation error
+    }
+</script>
+<!-- //password-script -->
+<!-- /js files -->
+<link href='__STATIC__/home/css/aos.css' rel='stylesheet prefetch' type="text/css" media="all" />
+<link href='__STATIC__/home/css/aos-animation.css' rel='stylesheet prefetch' type="text/css" media="all" />
+<script src='__STATIC__/home/js/aos.js'></script>
+<script src="__STATIC__/home/js/aosindex.js"></script>
+<!-- //js files -->
+<!--search-bar-->
+<script src="__STATIC__/home/js/main.js"></script>
+<script src="__STATIC__/home/js/responsiveslides.min.js"></script>
+<script>
+    $(function () {
+        $("#slider4").responsiveSlides({
+            auto: true,
+            pager: true,
+            nav: false,
+            speed: 1000,
+            namespace: "callbacks",
+            before: function () {
+                $('.events').append("<li>before event fired.</li>");
+            },
+            after: function () {
+                $('.events').append("<li>after event fired.</li>");
+            }
+        });
+    });
+</script>
+<!--//search-bar-->
+<!-- start-smoth-scrolling -->
+<script type="text/javascript" src="__STATIC__/home/js/move-top.js"></script>
+<script type="text/javascript" src="__STATIC__/home/js/easing.js"></script>
+<script type="text/javascript">
+    jQuery(document).ready(function ($) {
+        $(".scroll").click(function (event) {
+            event.preventDefault();
+            $('html,body').animate({
+                scrollTop: $(this.hash).offset().top
+            }, 900);
+        });
+    });
+</script>
+<!-- start-smoth-scrolling -->
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        /*
+         var defaults = {
+         containerID: 'toTop', // fading element id
+         containerHoverID: 'toTopHover', // fading element hover id
+         scrollSpeed: 1200,
+         easingType: 'linear'
+         };
+         */
+
+        $().UItoTop({
+            easingType: 'easeOutQuart'
+        });
+
+    });
+</script>
+<a href="#home" class="scroll" id="toTop" style="display: block;">
+    <span id="toTopHover" style="opacity: 1;"> </span>
+</a>
+<script type="text/javascript" src="__STATIC__/home/js/bootstrap.js"></script>
+
+
+</body>
+
+</html>

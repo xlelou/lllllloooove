@@ -1,0 +1,96 @@
+{include file='public/head' /}
+<div class="layui-form" lay-filter="layuiadmin-form-role" id="layuiadmin-form-role" style="padding: 20px 30px 0 0;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户名</label>
+        <div class="layui-input-block">
+            <input type="text" name="username" placeholder="用户名" autocomplete="off" class="layui-input">
+            <input type="hidden" name="id" value="0">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="truename" placeholder="真实姓名" autocomplete="off" class="layui-input">
+            <input type="hidden" name="id" value="0">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">年龄</label>
+        <div class="layui-input-block">
+            <input type="text" name="age" placeholder="年龄" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block">
+            <select name="sex">
+            <option value="m">男</option>
+            <option value="f">女</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">电话</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" placeholder="电话" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">用户角色</label>
+        <div class="layui-input-block">
+                <?php
+                 foreach($role as $v){
+                   $id = $v->id;
+                    $name = $v->name;
+                        if(in_array($v->id,$roleList)){
+                            echo '<input type="checkbox" name="roleid[]" checked value='.$id .' title='.$name.' />';
+                        }else{
+                            echo '<input type="checkbox" name="roleid[]" value='.$id .' title='.$name.' />';
+                        }
+                    }
+                ?>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否启用</label>
+        <div class="layui-input-block">
+            <select name="status">
+
+                <option value="0">是</option>
+                <option value="1">否</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item layui-hide">
+        <button class="layui-btn" lay-submit lay-filter="LAY-user-role-submit" id="LAY-user-role-submit">提交</button>
+    </div>
+</div>
+
+{include file="public/foot" /}
+
+<script>
+    layui.config({
+        base: base_static //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+        ,form = layui.form ;
+        var id = getQueryString('id') || 0
+        var username = getQueryString('username')
+        var truename = getQueryString('nickname')
+        var status = getQueryString('status')
+        var age = getQueryString('age')
+        var sex = getQueryString('sex')
+        var phone = getQueryString('phone')
+        $('input[type="hidden"]').val(id)
+        $('input[name="username"]').val(username)
+        $('input[name="truename"]').val(truename)
+        $('input[name="age"]').val(age)
+        $('input[name="phone"]').val(phone)
+        $('select[name="status"]').find('option[value='+status+']').attr("selected",true)
+        $('select[name="sex"]').find('option[value='+sex+']').attr("selected",true)
+        form.render();
+    })
+</script>

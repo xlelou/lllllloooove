@@ -1,0 +1,370 @@
+{include file='public/head' /}
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div style="padding-bottom: 10px;">
+                <button class="layui-btn layuiadmin-btn-role" data-type="batchdel">删除</button>
+                <button class="layui-btn layuiadmin-btn-role" data-type="add">添加</button>
+            </div>
+
+            <table id="test-table-page" lay-filter="test-table-page">
+
+            </table>
+            <script type="text/html" id="buttonTpl">
+                {{#  if(d.check == true){ }}
+                <button class="layui-btn layui-btn-xs">已审核</button>
+                {{#  } else { }}
+                <button class="layui-btn layui-btn-primary layui-btn-xs">未审核</button>
+                {{#  } }}
+            </script>
+            <script type="text/html" id="table-useradmin-admin">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+            </script>
+        </div>
+    </div>
+</div>
+
+{include file="public/foot" /}
+<script>
+    layui.config({
+        base: base_static //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table'], function() {
+        var admin = layui.admin
+                , table = layui.table
+                ,$ = layui.jquery;
+
+
+        table.render({
+            elem: '#test-table-page'
+            , url: '/room/rightList'
+            , toolbar: '#test-table-toolbar-toolbarDemo'
+            ,cols:[[
+                {type: "checkbox", fixed: "left"},
+                {field: "id", width: 80, title: 'id'},
+                {field:'name',title:'路径'},
+                { field: "title", width: 120,align:'center', title: "权限名"},
+                {field: "pname", width: 120,align:'center', title: "父节点",templet:function (d) {
+
+                    if(d.pname!==null){
+                       return d.pname.name
+                    }else{
+                        return  ''
+                    }
+
+//                    if(d.pname.id==='1'){
+//                        return '菜单'
+//                    }else if(d.level==='2'){
+//                        return '按钮'
+//                    }else{
+//                        return ''
+//                    }
+                }},
+                {field: "status", width: 120,align:'center', title: "级别",templet:function (d) {
+                    if(d.level==='1'){
+                        return '菜单'
+                    }else if(d.level==='2'){
+                        return '按钮'
+                    }else{
+                        return ''
+                    }
+                }},
+                {field: "status", width: 80, title: "状态",templet:function (d) {
+                    if(d.status==='0'){
+                        return '可用'
+                    }else{
+                        return '禁用'
+                    }
+                }},
+                {
+                    title: "操作",
+                    width: 150,
+                    align: "center",
+                    fixed: "right",
+                    toolbar: "#table-useradmin-admin"
+                }]]
+            , page: true
+        });
+
+
+        //事件
+        var active = {
+            batchdel: function(){
+                var checkStatus = table.checkStatus('test-table-page')
+                        ,checkData = checkStatus.data; //得到选中的数据
+
+                if(checkData.length === 0){
+                    return layer.msg('请选择数据');
+                }
+
+                layer.confirm('确定删除吗？', function(index) {
+                    for(var i=0;i<checkData.length;i++){
+                        var field = {
+                            id:checkData[i].id
+                        }
+                        $.ajax({
+                            url:'/room/delrole',
+                            type:'post',
+                            data:field,
+                            success:function (d) {
+                                if(d.code===200){
+                                    layer.msg(d.msg)
+                                    table.reload('test-table-page');
+                                }else{
+                                    layer.msg(d.msg)
+                                }
+
+                            }
+                        });
+                    }
+                    //执行 Ajax 后重载
+                    /*
+                     admin.req({
+                     url: 'xxx'
+                     //,……
+                     });
+                     */
+                    table.reload('test-table-page');
+                    layer.msg('已删除');
+                });
+            },
+            add: function(){
+                layer.open({
+                    type: 2
+                    ,title: '添加新角色'
+                    ,content: '/room/rightform'
+                    ,area: ['500px', '480px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        console.log(index)
+                        console.log(layero)
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                                ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+                            var field = data.field; //获取提交的字段
+                            console.log(field)
+                            if(field.name===''){
+                                layer.msg('请输入权限名称')
+                                return false
+                            }
+
+                            if(field.level===''){
+                                layer.msg('请选择权限级别')
+                                return false
+                            }
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url:'/room/addright',
+                                type:'post',
+                                data:field,
+                                success:function (d) {
+                                    if(d.code===200){
+                                        layer.alert(d.msg)
+                                        table.reload('test-table-page');
+                                        layer.close(index); //关闭弹层
+                                    }else{
+                                        layer.alert(d.msg)
+                                    }
+
+                                }
+                            });
+
+                        });
+                        submit.trigger('click');
+                    }
+                });
+            }
+        }
+
+        //监听行工具事件
+        table.on('tool(test-table-page)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+                layer.open({
+                    type: 2
+                    ,title: '添加新权限'
+                    ,content: '/room/rightform?id='+data.id+'&name='+data.name+'&status='+data.status+'&title='+data.title+'&pid='+data.pid+'&level='+data.level
+                    ,area: ['500px', '480px']
+                    ,btn: ['确定', '取消']
+                    ,yes: function(index, layero){
+                        var iframeWindow = window['layui-layer-iframe'+ index]
+                                ,submit = layero.find('iframe').contents().find("#LAY-user-role-submit");
+
+                        //监听提交
+                        iframeWindow.layui.form.on('submit(LAY-user-role-submit)', function(data){
+                            var field = data.field; //获取提交的字段
+                            console.log(field)
+                            if(field.name===''){
+                                layer.msg('请选择权限名称')
+                                return false
+                            }
+
+                            if(field.level===''){
+                                layer.msg('请选择权限级别')
+                                return false
+                            }
+                            //提交 Ajax 成功后，静态更新表格中的数据
+                            $.ajax({
+                                url:'/room/addright',
+                                type:'post',
+                                data:field,
+                                success:function (d) {
+                                    if(d.code===200){
+
+                                        table.reload('test-table-page');
+                                        layer.close(index); //关闭弹层
+                                    }else{
+                                        layer.alert(d.msg)
+                                    }
+
+                                }
+                            });
+                        });
+                        submit.trigger('click');
+                    }
+                });
+            } else if (obj.event === 'del') {
+                var data = obj.data;
+                var field ={
+                    id:data.id
+                }
+                $.ajax({
+                    url:'/room/delright',
+                    type:'post',
+                    data:field,
+                    success:function (d) {
+                        if(d.code===200){
+                            layer.msg(d.msg)
+                            table.reload('test-table-page');
+                        }else{
+                            layer.msg(d.msg)
+                        }
+
+                    }
+                });
+            }
+
+        });
+
+        $('.layui-btn.layuiadmin-btn-role').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+
+</script>
+
+<script>
+    //id div 的id，isMultiple 是否多选，chkboxType 多选框类型{"Y": "ps", "N": "s"} 详细请看ztree官网
+    function initSelectTree(id, isMultiple, chkboxType) {
+        var setting = {
+            view: {
+                dblClickExpand: false,
+                showLine: false
+            },
+            data: {
+                simpleData: {
+                    enable: true
+                }
+            },
+            check: {
+                enable: false,
+                chkboxType: {"Y": "ps", "N": "s"}
+            },
+            callback: {
+                onClick: onClick,
+                onCheck: onCheck
+            }
+
+        };
+        if (isMultiple) {
+            setting.check.enable = isMultiple;
+        }
+        if (chkboxType !== undefined && chkboxType != null) {
+            setting.check.chkboxType = chkboxType;
+        }
+        var html = '<div class = "layui-select-title" >' +
+                '<input id="' + id + 'Show"' + 'type = "text" placeholder = "请选择" value = "" class = "layui-input" readonly>' +
+                '<i class= "layui-edge" ></i>' +
+                '</div>';
+        $("#" + id).append(html);
+        $("#" + id).parent().append('<div class="tree-content scrollbar">' +
+                '<input hidden id="' + id + 'Hide" ' +
+                'name="' + $(".select-tree").attr("id") + '">' +
+                '<ul id="' + id + 'Tree" class="ztree scrollbar" style="margin-top:0;"></ul>' +
+                '</div>');
+        $("#" + id).bind("click", function () {
+            if ($(this).parent().find(".tree-content").css("display") !== "none") {
+                hideMenu()
+            } else {
+                $(this).addClass("layui-form-selected");
+                var Offset = $(this).offset();
+                var width = $(this).width() - 2;
+                $(this).parent().find(".tree-content").css({
+                    left: Offset.left + "px",
+                    top: Offset.top + $(this).height() + "px"
+                }).slideDown("fast");
+                $(this).parent().find(".tree-content").css({
+                    width: width
+                });
+                $("body").bind("mousedown", onBodyDown);
+            }
+        });
+        $.fn.zTree.init($("#" + id + "Tree"), setting, zNodes);
+    }
+
+    function beforeClick(treeId, treeNode) {
+        var check = (treeNode && !treeNode.isParent);
+        if (!check) alert("只能选择城市...");
+        return check;
+    }
+
+    function onClick(event, treeId, treeNode) {
+        var zTree = $.fn.zTree.getZTreeObj(treeId);
+        if (zTree.setting.check.enable == true) {
+            zTree.checkNode(treeNode, !treeNode.checked, false)
+            assignment(treeId, zTree.getCheckedNodes());
+        } else {
+            assignment(treeId, zTree.getSelectedNodes());
+            hideMenu();
+        }
+    }
+
+    function onCheck(event, treeId, treeNode) {
+        var zTree = $.fn.zTree.getZTreeObj(treeId);
+        assignment(treeId, zTree.getCheckedNodes());
+    }
+
+    function hideMenu() {
+        $(".select-tree").removeClass("layui-form-selected");
+        $(".tree-content").fadeOut("fast");
+        $("body").unbind("mousedown", onBodyDown);
+    }
+
+    function assignment(treeId, nodes) {
+        var names = "";
+        var ids = "";
+        for (var i = 0, l = nodes.length; i < l; i++) {
+            names += nodes[i].name + ",";
+            ids += nodes[i].id + ",";
+        }
+        if (names.length > 0) {
+            names = names.substring(0, names.length - 1);
+            ids = ids.substring(0, ids.length - 1);
+        }
+        treeId = treeId.substring(0, treeId.length - 4);
+        $("#" + treeId + "Show").attr("value", names);
+        $("#" + treeId + "Show").attr("title", names);
+        $("#" + treeId + "Hide").attr("value", ids);
+    }
+
+    function onBodyDown(event) {
+        if ($(event.target).parents(".tree-content").html() == null) {
+            hideMenu();
+        }
+    }
+</script>
