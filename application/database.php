@@ -13,13 +13,13 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '116.85.11.159',
+    'hostname'        => '116.85.11.156',
     // 数据库名
-    'database'        => 'lloovvee',
+    'database'        => 'll',
     // 用户名
     'username'        => 'root',
     // 密码
-    'password'        => 'xlelou',
+    'password'        => '',
     // 端口
     'hostport'        => '3306',
     // 连接dsn
