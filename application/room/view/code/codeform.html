@@ -1,0 +1,69 @@
+{include file='public/head' /}
+<div class="layui-form" lay-filter="layuiadmin-form-code" id="layuiadmin-form-code" style="padding: 20px 30px 0 0;">
+    
+    <div class=" layui-form" lay-filter="component-form-element">
+        <label class="layui-form-label">代码类别</label>
+          <div class="layui-input-block ">
+            <select name="types" lay-verify="required" lay-search>
+                <?php
+                
+                 foreach($types as $v){
+                   $id = $v->id;
+                    $title = $v->typename;
+                    echo '<option value="'.$id .'">'.$title.'</option>';
+                }
+            ?>
+            </select>
+        </div>
+      </div>
+      <div class="layui-form-item" style='margin-top: 10px;'>
+        <label class="layui-form-label">代码名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="codename" placeholder="代码名称" autocomplete="off" class="layui-input">
+            <input type="hidden" name="id" value="0">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">代码值</label>
+        <div class="layui-input-block">
+            <input type="text" name="codeID" placeholder="代码值" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item" style='margin-top: 10px;'>
+        <label class="layui-form-label">是否启用</label>
+        <div class="layui-input-block">
+            <select name="status">
+                <option value="0">是</option>
+                <option value="1">否</option>
+            </select>
+
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <button class="layui-btn" lay-submit lay-filter="LAY-user-code-submit" id="LAY-user-code-submit">提交</button>
+    </div>
+</div>
+
+{include file="public/foot" /}
+
+<script>
+    layui.config({
+        base: base_static //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'form'], function(){
+        var $ = layui.$
+        ,form = layui.form ;
+        var id = getQueryString('id') || 0
+        var name = getQueryString('name')
+        var status = getQueryString('status')
+        var codeID = getQueryString('codeID')
+        var typeid = getQueryString('typeid')
+        $('input[type="hidden"]').val(id)
+        $('input[name="codename"]').val(name)
+        $('input[name="codeID"]').val(codeID)
+        $('select').val(typeid)
+        $('select[name="status"]').find('option[value='+status+']').attr("selected",true)
+        form.render();
+    })
+</script>

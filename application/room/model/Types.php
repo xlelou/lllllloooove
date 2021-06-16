@@ -10,14 +10,14 @@ namespace app\room\model;
 use app\room\controller\JsonTrait;
 use app\room\model\RightAccess as RightAccessModel;
 
-class Code extends Base
+class Types extends Base
 {
-    protected $table = 'Pro_code';
+    protected $table = 'Pro_type';
 
 
-    public static function getCodeList($page,$limit)
+    public static function getTypeList($page,$limit)
     {
-        $result = self::page($page)->limit($limit)->alias('a')->join('pro_type b','a.type = b.id')->field('a.*,b.typename')->order("a.id")->select();
+        $result = self::page($page)->limit($limit)->order("id")->select();
         $count = count( self::select());
         if($result!==false){
             return JsonTrait::TableData(0,'获取成功',$count,$result);
@@ -26,12 +26,10 @@ class Code extends Base
         }
     }
 
-    public static function addCode($data)
+    public static function addType($data)
     {
-        $codename = $data['codename'];
+        $typename = $data['typename'];
         $status = $data['status'];
-        $typeid = $data['types'];
-        $codeID = $data['codeID'];
         $id = $data['id'];
         if($id!='0'){
             $info = self::where('id',$id)->find();
@@ -39,30 +37,26 @@ class Code extends Base
             $info = '';
         }
         if($info!==''){
-            $hasType = self::where('id','<>',$id)->where("display",$codename)->find();
+            $hasType = self::where('id','<>',$id)->where("typename",$typename)->find();
  ;
             if($hasType!=null){
                 return JsonTrait::JsonData(401,'类型名称已存在，请重新添加');
             }else{
                 $result = self::where('id',$id)->update([
-                    'display' => $codename,
-                    'status' => $status,
-                    'type' => $typeid,
-                    'codeID' => $codeID
+                    'typename' => $typename,
+                    'status' => $status
                 ]);
                 return JsonTrait::JsonData(200,'更新成功');
             }
 
         }else{
-            $hasType = self::where('id','<>',$id)->where("display",$codename)->find();
+            $hasType = self::where('id','<>',$id)->where("typename",$typename)->find();
             if($hasType!=null){
                 return JsonTrait::JsonData(401,'角色名称已存在，请重新添加');
             }else{
                 $result = self::create([
-                    'display' => $codename,
+                    'typename' => $typename,
                     'status' => $status,
-                    'type' => $typeid,
-                    'codeID' => $codeID
                 ]);
                 return JsonTrait::JsonData(200,'添加成功');
             }
@@ -70,7 +64,13 @@ class Code extends Base
         }
     }
 
-    public static function delCode($data)
+    public static function getTypes(){
+        $getTypes = self::select();
+         return $getTypes;
+     }
+ 
+
+    public static function delType($data)
     {
         $id = $data['id'];
         $info = self::where('id',$id)->delete();

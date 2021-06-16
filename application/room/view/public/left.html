@@ -74,10 +74,10 @@
             }else{
                 ?>
                 var urls = <?=$urls?>;
-                console.log(urls)
                 var arr = {}
+                urls = urls.sort(compare('sort'))
                 for(var i = 0;i<urls.length;i++){
-                    console.log(arr.hasOwnProperty(urls[i].pname.name))
+                  
                     if(arr.hasOwnProperty(urls[i].pname.name)>0){
                         arr[urls[i].pname.name].push(urls[i])
                     }else{
@@ -85,12 +85,11 @@
                         arr[urls[i].pname.name].push(urls[i])
                     }
                 }
-
+                
                 var html = ''
                 for(var i in arr){
                     var child = '';
                     for(var j =0;j<arr[i].length;j++){
-                        console.log(arr[i][j])
                         child += `<dl class="layui-nav-child">
                         <dd data-name="list"><a lay-href="${arr[i][j].name}">${arr[i][j].title}</a></dd>
                     </dl>`
@@ -107,6 +106,14 @@
             }
 
             ?>
-
+            function compare(property)
+                {
+                    return function(a,b){
+                        var value1 = a[property];
+                        var value2 = b[property];
+                        return value1-value2;
+                    }
+                }
+ 
 
 </script>

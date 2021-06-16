@@ -37,7 +37,7 @@ class Base extends Controller
                 }
             }
             foreach ($rights as $v){
-                $url = RightModel::with('pname')->where('id',$v)->order('id asc')->select();
+                $url = RightModel::with('pname')->alias('a')->join('pro_controller b','a.pid=b.id')->field('a.*,b.sort')->order('b.sort asc')->where('a.id',$v)->select();
                 $urls = array_merge($urls,$url);
                 $nowUrl = RightModel::where('id',$v)->column('name');
                 $this->nowUrls = array_merge($this->nowUrls,$nowUrl);
@@ -46,7 +46,7 @@ class Base extends Controller
                 $this->assign('urls',json_encode($urls));
             }
         }else{
-           $urls =  RightModel::with('pname')->select();
+           $urls =  RightModel::with('pname')->alias('a')->join('pro_controller b','a.pid=b.id')->field('a.*,b.sort')->order('b.sort asc')->order('a.id asc')->select();
             $this->assign('urls',json_encode($urls));
         }
         $controller = request()->instance()->controller();

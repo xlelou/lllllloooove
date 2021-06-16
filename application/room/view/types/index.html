@@ -3,8 +3,8 @@
     <div class="layui-card">
         <div class="layui-card-body">
             <div style="padding-bottom: 10px;">
-                <button class="layui-btn layuiadmin-btn-code" data-type="batchdel">删除</button>
-                <button class="layui-btn layuiadmin-btn-code" data-type="add">添加</button>
+                <button class="layui-btn layuiadmin-btn-type" data-type="batchdel">删除</button>
+                <button class="layui-btn layuiadmin-btn-type" data-type="add">添加</button>
 
             </div>
 
@@ -39,14 +39,12 @@
 
         table.render({
             elem: '#test-table-page'
-            , url: '/room/codeList'
+            , url: '/room/typeList'
             , toolbar: '#test-table-toolbar-toolbarDemo'
             ,cols:[[
                 {type: "checkbox", fixed: "left"},
                 {field: "id", width: 80, title: 'id', sort: !0},
-                { field: "display", title: "代码名称"},
-                { field: "codeID", title: "代码值"},
-                { field: "typename", title: "代码类型"},
+                { field: "typename", title: "码表类别"},
                 {field: "status", title: "状态",templet:function (d) {
                     if(d.status==='0'){
                         return '可用'
@@ -81,7 +79,7 @@
                             id:checkData[i].id
                         }
                         $.ajax({
-                            url:'/room/delcode',
+                            url:'/room/delType',
                             type:'post',
                             data:field,
                             success:function (d) {
@@ -109,21 +107,21 @@
             add: function(){
                 layer.open({
                     type: 2
-                    ,title: '添加代码'
-                    ,content: '/room/codeform?id=0'
+                    ,title: '添加新类别'
+                    ,content: '/room/typesform?id=0'
                     ,area: ['500px', '480px']
                     ,btn: ['确定', '取消']
                     ,yes: function(index, layero){
                         var iframeWindow = window['layui-layer-iframe'+ index]
-                                ,submit = layero.find('iframe').contents().find("#LAY-user-code-submit");
+                                ,submit = layero.find('iframe').contents().find("#LAY-user-type-submit");
 
                         //监听提交
-                        iframeWindow.layui.form.on('submit(LAY-user-code-submit)', function(data){
+                        iframeWindow.layui.form.on('submit(LAY-user-type-submit)', function(data){
                             var field = data.field; //获取提交的字段
                             console.log(field)
                             //提交 Ajax 成功后，静态更新表格中的数据
                             $.ajax({
-                                url:'/room/addcode',
+                                url:'/room/addtype',
                                 type:'post',
                                 data:field,
                                 success:function (d) {
@@ -152,25 +150,25 @@
             if (obj.event === 'edit') {
                 layer.open({
                     type: 2
-                    ,title: '修改代码'
-                    ,content: '/room/codeform?id='+data.id+'&name='+data.display+'&status='+data.status+'&codeID='+data.codeID+'&typeid='+data.type
+                    ,title: '更新类别'
+                    ,content: '/room/typesform?id='+data.id+'&name='+data.typename+'&status='+data.status
                     ,area: ['500px', '480px']
                     ,btn: ['确定', '取消']
                     ,yes: function(index, layero){
                         var iframeWindow = window['layui-layer-iframe'+ index]
-                                ,submit = layero.find('iframe').contents().find("#LAY-user-code-submit");
+                                ,submit = layero.find('iframe').contents().find("#LAY-user-type-submit");
 
                         //监听提交
-                        iframeWindow.layui.form.on('submit(LAY-user-code-submit)', function(data){
+                        iframeWindow.layui.form.on('submit(LAY-user-type-submit)', function(data){
                             var field = data.field; //获取提交的字段
                             console.log(field)
-                            if(!field.codename){
-                                layer.msg("请输入代码名称")
+                            if(!field.typename){
+                                layer.msg("请输入类别名称")
                                 return false
                             }
                             //提交 Ajax 成功后，静态更新表格中的数据
                             $.ajax({
-                                url:'/room/addCode',
+                                url:'/room/addType',
                                 type:'post',
                                 data:field,
                                 success:function (d) {
@@ -197,7 +195,7 @@
                     id:data.id
                 }
                 $.ajax({
-                    url:'/room/delcode',
+                    url:'/room/delType',
                     type:'post',
                     data:field,
                     success:function (d) {
@@ -214,7 +212,8 @@
 
         });
 
-        $('.layui-btn.layuiadmin-btn-code').on('click', function(){
+        $('.layui-btn.layuiadmin-btn-type').on('click', function(){
+            console.log(111)
             var type = $(this).data('type');
             active[type] ? active[type].call(this) : '';
         });

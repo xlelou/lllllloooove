@@ -7,36 +7,32 @@
  */
 
 namespace app\room\controller;
-use app\room\model\Code as CodeModel;
 use app\room\model\Types as TypesModel;
-class Code extends Base
+class Types extends Base
 {
     public function index()
     {
         return $this->fetch('index');
     }
-    public function codeform()
+    public function typesform()
     {
-        $getTypes = TypesModel::getTypes();
-        $this->assign('types',$getTypes);
-        return $this->fetch('codeform');
+        return $this->fetch('typesform');
     }
-    public  function getCodeList(){
+    public  function getTypeList(){
         $page = $_GET['page']?$_GET['page']:1;
         $limit = $_GET['limit']?$_GET['limit']:10;
-        return CodeModel::getCodeList($page,$limit);
+        return TypesModel::getTypeList($page,$limit);
     }
 
-    public function addCode()
+    public function addType()
     {
         $post = request()->instance()->post();
-        return CodeModel::addCode($post);
-    }
-   
-    public function delCode()
-    {
-        $post = request()->instance()->post();
-        return CodeModel::delCode($post);
+        return TypesModel::addType($post);
     }
 
+    public function delType()
+    {
+        $post = request()->instance()->post();
+        return TypesModel::delType($post);
+    }
 }

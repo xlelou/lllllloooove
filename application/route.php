@@ -36,11 +36,12 @@ Route::get('/room/rightform','room/right/rightform');//编辑权限页面
 Route::get('/room/menuform','room/menu/menuform');//控制器编辑页面
 Route::get('/room/frontUpolad','room/banners/frontUpload');//前端页面轮播图
 Route::get('/room/bannerForm','room/banners/bannerForm');
-Route::get('/room/code','room/code/index');
 
+Route::get('/room/code','room/code/index');//码表显示
+Route::get('/room/codeForm','room/code/codeForm');//码表编辑
 
-Route::get('/front/banners','index/banner/index');
-
+Route::get('/room/types','room/types/index');//码表类型显示
+Route::get('/room/typesForm','room/types/typesForm');//码表类型编辑
 
 // get
 Route::get('/room/loginOut','room/Index/loginOut');//登出系统
@@ -49,6 +50,7 @@ Route::get('/room/roleList','room/Role/getRoleList');//获取角色列表
 Route::get('/room/rightList','room/right/getallrights');//获取所有权限
 Route::get('/room/menulist','room/menu/getMenu');//获取菜单控制器
 Route::get('/room/codeList','room/Code/getCodeList');//获取码表列表
+Route::get('/room/typeList','room/types/getTypeList');//获取码表列表
 //post
 Route::post('/room/login','room/Index/login');//登录提交
 Route::post('/room/systemSetting','room/System/saveSettings');//保存系统设置
@@ -60,7 +62,10 @@ Route::post('/room/addright','room/right/addright');//添加权限
 Route::post('/room/delright','room/right/delright');//删除权限
 Route::post('/room/addMenu','room/menu/addmenu');//添加菜单控制器
 Route::post('/room/delMenu','room/menu/delmenu');//删除菜单控制器
-
+Route::post('/room/addType','room/types/addType');//添加码表类别
+Route::post('/room/delType','room/types/delType');//删除码表类别
+Route::post('/room/addCode','room/code/addCode');//添加码表代码
+Route::post('/room/delCode','room/code/delCode');//删除码表代码
 //后台新增内容--前端post
 Route::post('/room/addBanner','room/banners/addBanner');//新增轮播信息
 Route::post('/room/delBanners','room/banners/delBanners');//删除轮播信息
@@ -71,3 +76,8 @@ Route::get('/room/getBanners','room/banners/getBanners');//新增轮播信息
 
 // 图片上传
 Route::post('room/uploads','room/upload/uploads');//图片上传接口
+
+
+//ajax 请求
+
+Route::get('/front/banners','index/banner/index');//前端页面显示
