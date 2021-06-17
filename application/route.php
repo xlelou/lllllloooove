@@ -35,7 +35,7 @@ Route::get('/room/right','room/right/index');//权限页面
 Route::get('/room/rightform','room/right/rightform');//编辑权限页面
 Route::get('/room/menuform','room/menu/menuform');//控制器编辑页面
 Route::get('/room/frontUpolad','room/banners/frontUpload');//前端页面轮播图
-Route::get('/room/bannerForm','room/banners/bannerForm');
+Route::get('/room/bannerForm','room/banners/bannerForm');// 前端轮播页面编辑
 
 Route::get('/room/code','room/code/index');//码表显示
 Route::get('/room/codeForm','room/code/codeForm');//码表编辑
@@ -43,6 +43,8 @@ Route::get('/room/codeForm','room/code/codeForm');//码表编辑
 Route::get('/room/types','room/types/index');//码表类型显示
 Route::get('/room/typesForm','room/types/typesForm');//码表类型编辑
 
+Route::get('/room/article','room/article/index');//文章编辑主页面
+Route::get('/room/addarticle','room/article/addarticle');//文章添加页面
 // get
 Route::get('/room/loginOut','room/Index/loginOut');//登出系统
 Route::get('/room/UserLists','room/User/userLists');//获取用户列表

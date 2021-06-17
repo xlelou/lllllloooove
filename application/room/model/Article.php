@@ -8,16 +8,15 @@
 
 namespace app\room\model;
 use app\room\controller\JsonTrait;
-use app\room\model\RightAccess as RightAccessModel;
 
-class Code extends Base
+class Article extends Base
 {
-    protected $table = 'pro_code';
+    protected $table = 'pro_article';
 
 
-    public static function getCodeList($page,$limit)
+    public static function getList($page,$limit)
     {
-        $result = self::page($page)->limit($limit)->alias('a')->join('pro_type b','a.type = b.id')->field('a.*,b.typename')->order("a.id")->select();
+        $result = self::page($page)->limit($limit)->order("id")->select();
         $count = count( self::select());
         if($result!==false){
             return JsonTrait::TableData(0,'获取成功',$count,$result);
@@ -26,7 +25,7 @@ class Code extends Base
         }
     }
 
-    public static function addCode($data)
+    public static function add($data)
     {
         $codename = $data['codename'];
         $status = $data['status'];
@@ -70,7 +69,7 @@ class Code extends Base
         }
     }
 
-    public static function delCode($data)
+    public static function del($data)
     {
         $id = $data['id'];
         $info = self::where('id',$id)->delete();

@@ -12,7 +12,7 @@ use app\room\model\RightAccess as RightAccessModel;
 
 class Types extends Base
 {
-    protected $table = 'Pro_type';
+    protected $table = 'pro_type';
 
 
     public static function getTypeList($page,$limit)

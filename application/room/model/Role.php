@@ -12,7 +12,7 @@ use app\room\model\RightAccess as RightAccessModel;
 
 class Role extends Base
 {
-    protected $table = 'Pro_role';
+    protected $table = 'pro_role';
 
 
     public static function getRoleList($page,$limit)
